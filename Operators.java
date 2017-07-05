@@ -1,4 +1,4 @@
-/** Operators class. Used to pass a set of operators; method getPrecedence allows for checking valid
+/** Operators class. Used to pass a set of operators; method ops.getPrecedence allows for checking valid
  * operators and returning their precedence.
  *
  * @author Ian (ianH92)
@@ -12,10 +12,10 @@ public class Operators {
 	
 	/** Constructs an empty operators object, private method.
 	 */
-	private Operators() {
-		this.operators = {'+', '&', '^', '\''};
-		this.precedence = {2, 2, 2, 1};
-		this.arity = {2, 2, 2, 1};
+	public Operators() {
+		this.operators = new char[]{'+', '&', '^', '\''};
+		this.precedence = new int[]{2, 2, 2, 1};
+		this.arity = new int[]{2, 2, 2, 1};
 	}
 	
 	
@@ -25,7 +25,7 @@ public class Operators {
 	 * @param c The operator for which to validate and determine precedence.
 	 * @return The precedence of the operator.
 	 */
-	public int getPrecedence(char c) throws illegalArgumentException {
+	public int getPrecedence(char c) throws IllegalArgumentException {
 		int index = 0;
 		for(char o: operators) {
 			if(o == c) {
@@ -34,12 +34,12 @@ public class Operators {
 			index++;
 		}
 		// If code reaches here, the passed argument was invalid.
-		throw new illegalArgumentException("Passed character is not a valid operator.");
+		throw new IllegalArgumentException("Passed character is not a valid operator.");
 	}
 	
 	/**
 	 */
-	public int getArity(char c) throws illegalArgumentException {
+	public int getArity(char c) throws IllegalArgumentException {
 		int index = 0;
 		for(char o: operators) {
 			if(o == c) {
@@ -48,18 +48,18 @@ public class Operators {
 			index++;
 		}
 		// If code reaches here, the passed argument was invalid.
-		throw new illegalArgumentException("Passed character is not a valid operator.");
+		throw new IllegalArgumentException("Passed character is not a valid operator.");
 	}
 	
 	/**
 	 *
 	 */
-	public char performOperatation(char operator, char... args) throws ExpressionError{
+	public char performOperation(char operator, char... args) throws ExpressionError{
 		switch (operator) {
-			case '+': (args[0] == '1' || args[1] == '1') ? return '1':return '0';
-			case '&': (args[0] == '1' && args[1] == '1') ? return '1':return '0';
-			case '^': (args[0] != args[1]) ? return '1':return '0';
-			case '\'': (args[0] == '1') ? return '1':return '0';
+			case '+': return (args[0] == '1' || args[1] == '1') ? '1':'0';
+			case '&': return (args[0] == '1' && args[1] == '1') ? '1':'0';
+			case '^': return (args[0] != args[1]) ? '1':'0';
+			case '\'': return(args[0] == '1') ? '0':'1';
 			default: throw new ExpressionError("Unsupported Operator");
 		}
 	}

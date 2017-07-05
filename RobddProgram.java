@@ -31,6 +31,9 @@ import javafx.scene.control.MenuItem;
 // Modality imports
 import javafx.stage.Modality;
 
+// Label imports
+import javafx.scene.control.Label;
+
 /**
  *
  */
@@ -52,13 +55,13 @@ public class RobddProgram extends Application {
 	private MenuItem help;
 	
 	private String equation;
-	private String varOrder;
+	private String order;
 	private char[] charEquation;
-	private char[] varOrder
+	private char[] varOrder;
 	private char[] reservedChars;
 	
-	private final int WIDTH;
-	private final int HEIGHT;
+	private int WIDTH;
+	private int HEIGHT;
 	
 	
 	/**
@@ -94,8 +97,8 @@ public class RobddProgram extends Application {
 				this.varOrder = order.toCharArray();
 				this.charEquation = ShuntingYardAlgorithm.infixToPostfix(equation, varOrder, new Operators());
 				
-			} catch(ExpressionError e) {
-				errorDisplay(e);
+			} catch(ExpressionError err) {
+				errorDisplay(err);
 			}
 		});
 		
@@ -114,12 +117,12 @@ public class RobddProgram extends Application {
 		VBox err = new VBox(10.0);
 		err.setAlignment(Pos.CENTER);
 		Button b = new Button("Close");
-		b.setOnAction(e -> {
+		b.setOnAction(n -> {
 			errorMsg.close();
 		});
 		Label errMsg = new Label(e.getMessage());
 		err.getChildren().addAll(errMsg, b);
-		errorMsg.setScene(new Scene(error, 300.0, 300.0));
+		errorMsg.setScene(new Scene(err, 300.0, 300.0));
 		errorMsg.show();
 	}
 	
@@ -127,8 +130,8 @@ public class RobddProgram extends Application {
 	 * @param s The String to check.
 	 * @param reserved An array of reserved characters.
 	 */
-	private void checkString(String s, char[] reserved) {
-		for(int i = 0; i < s.size(); i++) {
+	private void checkString(String s, char[] reserved) throws ExpressionError {
+		for(int i = 0; i < s.length(); i++) {
 			for(int j = 0; j < reserved.length; j++) {
 				if(reserved[j] == s.charAt(i)) {
 					throw new ExpressionError("Error: Character " + reserved[j] + " is reserved" +
@@ -136,15 +139,15 @@ public class RobddProgram extends Application {
 				}
 			}
 		}
-		return false;
+		return;
 	}
 	
 	private void initialize() {
-		this.width = 1000;
-		this.height = 600;
+		this.WIDTH = 1000;
+		this.HEIGHT = 600;
 		this.equation = null;
 		this.varOrder = null;
-		this.reservedChars = {'0', '1'};
+		this.reservedChars = new char[]{'0', '1'};
 		
 		// Creating primary layout
 		primaryLayout = new GridPane();

@@ -20,7 +20,7 @@ public class RobddBuilder {
 	 */
 	public static RobddNode build(char[] expression, char[] variableOrder, Operators ops, RobddNodeTable t) throws ExpressionError {
 		UniqueTable h = new UniqueTable(500);
-		int root = buildHelper(expression, 0, variableOrder, t, h);
+		int root = buildHelper(expression, 0, variableOrder, t, h, ops);
 		return t.get(root);
 	}
 	
@@ -35,8 +35,8 @@ public class RobddBuilder {
 	private static int buildHelper(char[] exp, int i, char[]varOrder, RobddNodeTable t, 
 									UniqueTable h, Operators ops) throws ExpressionError {
 		if(i < varOrder.length) {
-			int v0 = buildHelper(shannonExpansion(exp, varOrder[i], '0'), (i + 1), varOrder, t, h);
-			int v1 = buildHelper(shannonExpansion(exp, varOrder[i], '1'), (i + 1), varOrder, t, h);
+			int v0 = buildHelper(shannonExpansion(exp, varOrder[i], '0'), (i + 1), varOrder, t, h, ops);
+			int v1 = buildHelper(shannonExpansion(exp, varOrder[i], '1'), (i + 1), varOrder, t, h, ops);
 			return make(i, v0, v1, t, h);
 		} else {
 			return postfixEvaluator(exp, ops);
@@ -73,13 +73,13 @@ public class RobddBuilder {
 		char currChar = 'a';
 		
 		while(index < exp.length) {
-			currChar = exp[index]
+			currChar = exp[index];
 			
 			if(currChar == '0' || currChar =='1') {
 				// It is a variable.
 				stack.push(new Character(currChar));
 				
-			} else if(ShuntingYardAlgorithm.checkArray(currChar, ops.operators) {
+			} else if(ShuntingYardAlgorithm.checkArray(currChar, ops.operators)) {
 				// It is an operator.
 				int operatorArgs = ops.getArity(currChar);
 				
@@ -89,9 +89,9 @@ public class RobddBuilder {
 				
 				if(operatorArgs == 1) {
 					stack.push(new Character(ops.performOperation
-										(currChar, stack.pop().charValue(), stack.pop().charValue()));
+										(currChar, stack.pop().charValue(), stack.pop().charValue())));
 				} else {
-					stack.push(new Character(ops.performOperation(currChar, stack.pop().charValue()));
+					stack.push(new Character(ops.performOperation(currChar, stack.pop().charValue())));
 				}
 			} else {
 				throw new ExpressionError("Not all variables have been initialized to values.");
@@ -100,7 +100,7 @@ public class RobddBuilder {
 		}
 		
 		if(stack.size() == 1) {
-			return stack.pop().getNumericValue();
+			return Character.getNumericValue(stack.pop().charValue());
 		} else {
 			throw new ExpressionError("There are too many variables in the Expression.");
 		}
@@ -117,7 +117,7 @@ public class RobddBuilder {
 		int index = 0;
 		char currChar = 'a';
 		
-		while(index < exp.length()) {
+		while(index < exp.length) {
 			currChar = exp[index];
 			
 			if(currChar == variable) {

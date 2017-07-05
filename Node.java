@@ -12,7 +12,7 @@ public class Node<T> {
 	 * @param val the value for the Node.
 	 * @param nxt the link to the next Node.
 	 */
-	public Node(T, Node<T> nxt) {
+	public Node(T val, Node<T> nxt) {
 		this.value = val;
 		this.next = nxt;
 	}
