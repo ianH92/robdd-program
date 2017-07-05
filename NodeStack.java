@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
  * @version 2.0
  * @since June 10th, 2017
  */
-public class NodeStack<T> implements Stack {
+public class NodeStack<T> implements Stack<T> {
 	private Node<T> top;
 	private int size;
 	
@@ -44,7 +44,7 @@ public class NodeStack<T> implements Stack {
 	public T pop() {
 		if(size > 0) {
 			// Temp variables to hold top values and list
-			Node temp = top.getNext();
+			Node<T> temp = top.getNext();
 			T value = top.getValue();
 			
 			// Delete the top, set new top and return

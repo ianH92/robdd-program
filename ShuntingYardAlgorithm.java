@@ -18,7 +18,7 @@ public class ShuntingYardAlgorithm {
 	 */
 	public static char[] infixToPostfix(String input, char[] variables, Operators ops) throws ExpressionError {
 		// Reject empty expressions.
-		int inputLength = input.size();
+		int inputLength = input.length();
 		if(inputLength == 0) {
 			throw new ExpressionError("Error: Input an equation.");
 		}
@@ -30,8 +30,6 @@ public class ShuntingYardAlgorithm {
 		final char[] parens = {'(', '[', '{', ')', ']', '}'};
 		final char[] leftParens = {'(', '[', '{'};
 		final char[] rightParens = {')', ']', '}'};
-		
-		int inputLength = input.size();
 		
 		NodeStack<Character> stack = new NodeStack<>();
 		
@@ -58,7 +56,7 @@ public class ShuntingYardAlgorithm {
 				if(checkArray(currChar, variables)) {
 					output[outputIndex] = currChar;
 					outputIndex++;
-				} else if(checkArray(currChar, Ops.operators)) {
+				} else if(checkArray(currChar, ops.operators)) {
 					try {
 						tempChar = stack.peek().charValue();
 						
@@ -71,7 +69,7 @@ public class ShuntingYardAlgorithm {
 							outputIndex++;
 							tempChar = stack.peek().charValue();
 						}
-					} catch(illegalArgumentException e) {
+					} catch(IllegalArgumentException e) {
 						// This is fine, tempChar was not an operator
 					} catch(NoSuchElementException e) {
 						// This is fine - stack is empty; while loop is done.
@@ -94,14 +92,14 @@ public class ShuntingYardAlgorithm {
 						}
 					} catch(NoSuchElementException e) {
 						// Stack empty before a left parenthesis found; there are mismatched parens.
-						throw new ExpressionError("Mismatched parentheses in expression" +
+						throw new ExpressionError("Mismatched parentheses in expression"
 													+ ", expected a left parenthesis.");
 					}
 					
 					// Pop left parenthesis; do not append to output
 					stack.pop();
 				} else {
-					String msg = "Error: " + currChar + "is not a variable, operator, or parenthesis."
+					String msg = "Error: " + currChar + "is not a variable, operator, or parenthesis.";
 					throw new ExpressionError(msg);
 				}
 			}
@@ -130,11 +128,11 @@ public class ShuntingYardAlgorithm {
 	 * @param array The char array to search.
 	 * @return True if found, false otherwise.
 	 */
-	private static boolean checkArray(char a, char[] array) {
+	public static boolean checkArray(char a, char[] array) {
 		// Traverse array.
-		for(int i: array) {
+		for(char c: array) {
 			// If a is equal, return true.
-			if(a == array[i]) {
+			if(a == c) {
 				return true;
 			}
 		}

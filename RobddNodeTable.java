@@ -17,10 +17,10 @@ public class RobddNodeTable {
 		this.tableSize = startSize;
 		
 		// Zero Node
-		this.table[0] = RobddNode.RobddNode(-2, -1, -1, this.nextSpot);
+		this.table[0] = new RobddNode(-2, -1, -1, this.nextSpot);
 		this.nextSpot++;
 		// One Node
-		this.table[1] = RobddNode.RobddNode(-1, -1, -1, this.nextSpot);
+		this.table[1] = new RobddNode(-1, -1, -1, this.nextSpot);
 		this.nextSpot++;
 	}
 	
@@ -32,7 +32,7 @@ public class RobddNodeTable {
 	 */
 	public int add(int i, int l, int h) {
 		int u = this.nextSpot;
-		RobddNode tmp = RobddNode.RobddNode(i, l, h, u);
+		RobddNode tmp = new RobddNode(i, l, h, u);
 		
 		if((this.tableSize - 2) > u) {
 			this.table[u] = tmp;

@@ -25,15 +25,15 @@ public class Robdd {
 	 * @param variableOrder The variable Ordering being used.
 	 * @return The Robdd
 	 */
-	public static Robdd RobddFactory(char[] postfixExpression, char[] variableOrder, Operators ops) {
+	public static Robdd RobddFactory(char[] postfixExpression, char[] variableOrder, Operators ops) 
+	throws ExpressionError {
 		Robdd newRobdd = new Robdd();
 		
 		newRobdd.table =  new RobddNodeTable(200);
-		newRobdd.root = RobddBuilder.build(postfixExpression, variableOrder, ops, table);
-		
+		newRobdd.root = RobddBuilder.build(postfixExpression, variableOrder, ops, newRobdd.table);
 		newRobdd.levelsCount = new int[variableOrder.length + 1];
 		
-		
+		newRobdd.setLevelsRobdd(newRobdd.root, 1, 0);
 		return newRobdd;
 	}
 	
@@ -43,23 +43,26 @@ public class Robdd {
 	 * @param count The value for which a node should be counted. Indicates if the node
 	 * has been visited during traversal.
 	 */
-	private static void setLevels(Robdd r, RobddNode n, int count, int level) {
+	private void setLevelsRobdd(RobddNode n, int count, int level) {
 		if(n.getCount() < count) {
 			// Node hasn't been visited yet
 			n.incCount();
 			n.setLevel(level);
-			r.levelsCount[level]++;
+			this.levelsCount[level]++;
 		}else {
 			// Has been visited; adjust level count and set node level to current level.
 			n.incCount();
-			r.levelsCount[n.getLevel()]--;
+			this.levelsCount[n.getLevel()]--;
 			n.setLevel(level);
-			r.levelsCount[level]++;
+			this.levelsCount[level]++;
 		}
 		
 		// Visit child nodes
 		if(n.getLeftLink() >= 0) {
-			
+			setLevelsRobdd(this.table.get(n.getLeftLink()), count, level++);
+		}
+		if(n.getRightLink() >= 0) {
+			setLevelsRobdd(this.table.get(n.getRightLink()), count, level++);
 		}
 	}
 }
