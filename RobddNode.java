@@ -14,6 +14,8 @@ public class RobddNode {
 	// Links to the child RobddNodes.
 	private int leftLink;
 	private int rightLink;
+	private RobddNode leftChild;
+	private RobddNode rightChild;
 	
 	// Identifies if the Node has been counted during a traversal.
 	private int count;
@@ -26,13 +28,16 @@ public class RobddNode {
 	 * @param lev The level of the node, determined by the variable (user should check the varible 
 	 * ordering and assign the value based on that.)
 	 */
-	public RobddNode(int i, int l, int h, int nodeNumber) {
+	public RobddNode(int i, int l, int h, int nodeNumber, RobddNode left, RobddNode right) {
 		this.nodeNumber = nodeNumber;
 		this.variable = i;
-		this.leftLink = l;
-		this.rightLink = h;
 		this.count = 0;
 		this.level = -1;
+		
+		this.leftLink = l;
+		this.rightLink = h;
+		this.leftChild = left;
+		this.rightChild = right;
 	}
 	
 	/** Increases number of times node has been counted.
@@ -83,11 +88,27 @@ public class RobddNode {
 		return this.rightLink;
 	}
 	
+	public RobddNode getLeftChild() {
+		return this.leftChild;
+	}
+	
+	public RobddNode getRightChild() {
+		return this.rightChild;
+	}
+	
 	/**
 	 *
 	 */
 	public void setLevel(int level) {
 		this.level = level;
+	}
+	
+	public void setLeftChild(RobddNode l) {
+		this.leftChild = l;
+	}
+	
+	public void setRightChild(RobddNode r) {
+		this.rightChild = r;
 	}
 	
 	/** Returns node variable.
