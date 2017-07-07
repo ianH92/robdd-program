@@ -33,6 +33,8 @@ public class ShuntingYardAlgorithm {
 		
 		NodeStack<Character> stack = new NodeStack<>();
 		
+		// Keep track of the new output length; will be different if input contains parens.
+		int outputLen = 0;
 		char[] output = new char[inputLength];
 		int outputIndex = 0;
 		int inputIndex = 0;
@@ -56,6 +58,7 @@ public class ShuntingYardAlgorithm {
 				if(checkArray(currChar, variables)) {
 					output[outputIndex] = currChar;
 					outputIndex++;
+					outputLen++;
 				} else if(checkArray(currChar, ops.operators)) {
 					try {
 						tempChar = stack.peek().charValue();
@@ -67,6 +70,7 @@ public class ShuntingYardAlgorithm {
 							// Pop the top of the stack and append to the output string.
 							output[outputIndex] = stack.pop().charValue();
 							outputIndex++;
+							outputLen++;
 							tempChar = stack.peek().charValue();
 						}
 					} catch(IllegalArgumentException e) {
@@ -88,6 +92,7 @@ public class ShuntingYardAlgorithm {
 						while(!checkArray(tempChar, leftParens)) {
 							output[outputIndex] = stack.pop().charValue();
 							outputIndex++;
+							outputLen++;
 							tempChar = stack.peek().charValue();
 						}
 					} catch(NoSuchElementException e) {
@@ -99,7 +104,7 @@ public class ShuntingYardAlgorithm {
 					// Pop left parenthesis; do not append to output
 					stack.pop();
 				} else {
-					String msg = "Error: " + currChar + "is not a variable, operator, or parenthesis.";
+					String msg = "Error: " + currChar + " is not a variable, operator, or parenthesis.";
 					throw new ExpressionError(msg);
 				}
 			}
@@ -119,7 +124,16 @@ public class ShuntingYardAlgorithm {
 			// Append the top of the stack to the outpu string.
 			output[outputIndex] = stack.pop().charValue();
 			outputIndex++;
+			outputLen++;
 		}
+		
+		// Now copy output to an appropriately-sized char array; if necessary
+		if(outputLen < output.length) {
+			char[] tmp = new char[outputLen];
+			System.arraycopy(output, 0, tmp, 0, outputLen);
+			output = tmp;
+		}
+		
 		return output;
 	}
 	

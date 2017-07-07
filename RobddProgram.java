@@ -11,6 +11,9 @@ import javafx.scene.Group;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
 
+// BorderPane layouts
+import javafx.scene.layout.BorderPane;
+
 // GridPane imports
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
@@ -48,7 +51,7 @@ import javafx.scene.control.ScrollPane;
 public class RobddProgram extends Application {
 	private Stage primaryStage;
 	private Scene primaryScene;
-	private GridPane primaryLayout;
+	private BorderPane primaryLayout;
 	
 	private GridPane promptLayout;
 	private Button drawButton;
@@ -70,6 +73,7 @@ public class RobddProgram extends Application {
 	private Operators ops;
 	private Robdd robdd;
 	
+	private Canvas placeholderCanvas;
 	private Group canvasGroup;
 	private ScrollPane canvasScrollPane;
 	private Canvas nodeCanvas;
@@ -118,6 +122,7 @@ public class RobddProgram extends Application {
 				canvasGroup.getChildren().clear();
 				canvasGroup.getChildren().add(nodeCanvas);
 				canvasScrollPane.setContent(canvasGroup);
+				primaryLayout.setCenter(canvasScrollPane);
 			} catch(ExpressionError err) {
 				errorDisplay(err);
 			}
@@ -126,6 +131,10 @@ public class RobddProgram extends Application {
 		clearButton.setOnAction(e -> {
 				inputEqtn.clear();
 				inputOrder.clear();
+				canvasGroup.getChildren().clear();
+				canvasGroup.getChildren().add(placeholderCanvas);
+				canvasScrollPane.setContent(canvasGroup);
+				primaryLayout.setCenter(canvasScrollPane);
 		});
 	}
 	
@@ -143,7 +152,7 @@ public class RobddProgram extends Application {
 		});
 		Label errMsg = new Label(e.getMessage());
 		err.getChildren().addAll(errMsg, b);
-		errorMsg.setScene(new Scene(err, 300.0, 300.0));
+		errorMsg.setScene(new Scene(err, 200.0, 200.0));
 		errorMsg.show();
 	}
 	
@@ -164,26 +173,28 @@ public class RobddProgram extends Application {
 	}
 	
 	private void initialize() {
-		this.WIDTH = 250;
-		this.HEIGHT = 200;
+		WIDTH = 325;
+		HEIGHT = 200;
 		
-		this.equation = null;
-		this.order = null;
-		this.varOrder = null;
-		this.charEquation = null;
-		this.robdd = null;
-		this.ops = new Operators();
-		this.reservedChars = new char[]{'0', '1'};
+		// Calc widths and heights from base width and height
+		int canvasScrollPaneWidth = 125;
+		int canvasScrollPaneHeight = HEIGHT - 10;
+		int promptLayoutWidth = (WIDTH - canvasScrollPaneWidth);
+		int promptLayoutHeight = HEIGHT;
+		
+		// Initialize currently unused fields to null
+		equation = null;
+		order = null;
+		varOrder = null;
+		charEquation = null;
+		robdd = null;
+		ops = new Operators();
+		
+		// These are characters reserved for use by the program
+		reservedChars = new char[]{'0', '1'};
 		
 		// Creating primary layout
-		primaryLayout = new GridPane();
-		
-		// Creating canvas layout
-		canvasGroup = new Group();
-		canvasScrollPane = new ScrollPane();
-		canvasScrollPane.setContent(canvasGroup);
-		canvasScrollPane.setFitToHeight(true);
-		canvasScrollPane.setFitToWidth(true);
+		primaryLayout = new BorderPane();
 		
 		// Creating prompt sublayout
 		promptLayout = new GridPane();
@@ -206,9 +217,12 @@ public class RobddProgram extends Application {
 		promptLayout.setConstraints(clearButton, 1, 5);
 		promptLayout.getChildren().addAll(inputEqtn, inputOrder, drawButton, clearButton);
 		
+		// Setting promptLayout sizing constraints
+		promptLayout.setPrefWidth(promptLayoutWidth);
+		promptLayout.setPrefHeight(promptLayoutHeight);
+		
 		// Add promptLayout to primaryLayout
-		primaryLayout.setConstraints(promptLayout, 1, 2);
-		primaryLayout.getChildren().addAll(promptLayout);
+		primaryLayout.setLeft(promptLayout);
 		
 		// Creating menu and adding to primaryLayout
 		mainMenu = new MenuBar();
@@ -221,12 +235,22 @@ public class RobddProgram extends Application {
 		mainMenu.getMenus().addAll(fileMenu, helpMenu);
 		
 		// Adding mainMenu to primaryLayout
-		primaryLayout.setConstraints(mainMenu, 1, 1);
-		primaryLayout.getChildren().add(mainMenu);
+		primaryLayout.setTop(mainMenu);
+		
+		// Creating canvas layout, canvas group, and canvas scrollpane
+		canvasGroup = new Group();
+		canvasScrollPane = new ScrollPane();
+		canvasScrollPane.setContent(canvasGroup);
+		canvasScrollPane.setFitToHeight(true);
+		canvasScrollPane.setFitToWidth(true);
+		
+		// Creating placeholder white canvas
+		placeholderCanvas = DrawRobdd.getWhiteCanvas(canvasScrollPaneWidth, canvasScrollPaneHeight);
+		canvasGroup.getChildren().add(placeholderCanvas);
+		canvasScrollPane.setContent(canvasGroup);
 		
 		//Adding canvas to primaryLayout
-		primaryLayout.setConstraints(canvasScrollPane, 2, 2);
-		primaryLayout.getChildren().add(canvasScrollPane);
+		primaryLayout.setCenter(placeholderCanvas);
 		
 		// Setting primaryScene and Stage
 		primaryScene = new Scene(primaryLayout, WIDTH, HEIGHT);

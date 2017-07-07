@@ -75,6 +75,14 @@ public class DrawRobdd {
 		return canvas;		
 	}
 	
+	public static Canvas getWhiteCanvas(int width, int height) {
+		Canvas c = new Canvas(width, height);
+		GraphicsContext g = c.getGraphicsContext2D();
+		g.setFill(Color.WHITE);
+		g.fillRect(0, 0, width, height);
+		return c;
+	}
+	
 	private static int getMax(int[] a) {
 		int max = 0;
 		for(int i = 0; i < a.length; i++) {

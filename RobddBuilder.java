@@ -18,10 +18,10 @@ public class RobddBuilder {
 	 * @param variableOrder The char array containing the variable order.
 	 * @return The RobddNode that holds the root of the ROBDD.
 	 */
-	public static RobddNode build(char[] expression, char[] variableOrder, Operators ops) throws ExpressionError {
+	public static RobddNode build(char[] exp, char[] variableOrder, Operators ops) throws ExpressionError {
 		UniqueTable h = new UniqueTable(500);
 		RobddNodeTable t =  new RobddNodeTable(200);
-		int root = buildHelper(expression, 0, variableOrder, t, h, ops);
+		int root = buildHelper(exp, 0, variableOrder, t, h, ops);
 		return t.get(root);
 	}
 	
@@ -75,7 +75,6 @@ public class RobddBuilder {
 		
 		while(index < exp.length) {
 			currChar = exp[index];
-			
 			if(currChar == '0' || currChar =='1') {
 				// It is a variable.
 				stack.push(new Character(currChar));
