@@ -4,6 +4,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+// Group imports
+import javafx.scene.Group;
 
 // VBox imports
 import javafx.scene.layout.VBox;
@@ -34,6 +36,12 @@ import javafx.stage.Modality;
 // Label imports
 import javafx.scene.control.Label;
 
+// Canvas imports
+import javafx.scene.canvas.Canvas;
+
+// ScrollPane imports
+import javafx.scene.control.ScrollPane;
+
 /**
  *
  */
@@ -59,6 +67,13 @@ public class RobddProgram extends Application {
 	private char[] charEquation;
 	private char[] varOrder;
 	private char[] reservedChars;
+	private Operators ops;
+	private Robdd robdd;
+	
+	private Group canvasGroup;
+	private ScrollPane canvasScrollPane;
+	private Canvas nodeCanvas;
+	private Canvas egdeCanvas;
 	
 	private int WIDTH;
 	private int HEIGHT;
@@ -76,6 +91,7 @@ public class RobddProgram extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
+		this.primaryStage = primaryStage;
 		
 		// Initialize the primaryStage
 		initialize();
@@ -92,11 +108,16 @@ public class RobddProgram extends Application {
 			
 			
 			try {
-				checkString(equation, this.reservedChars);
-				checkString(order, this.reservedChars);
-				this.varOrder = order.toCharArray();
-				this.charEquation = ShuntingYardAlgorithm.infixToPostfix(equation, varOrder, new Operators());
+				checkString(equation, reservedChars);
+				checkString(order, reservedChars);
+				varOrder = order.toCharArray();
+				charEquation = ShuntingYardAlgorithm.infixToPostfix(equation, varOrder, ops);
+				robdd = Robdd.RobddFactory(charEquation, varOrder, ops);
+				nodeCanvas = DrawRobdd.drawRobddNodes(robdd, varOrder);
 				
+				canvasGroup.getChildren().clear();
+				canvasGroup.getChildren().add(nodeCanvas);
+				canvasScrollPane.setContent(canvasGroup);
 			} catch(ExpressionError err) {
 				errorDisplay(err);
 			}
@@ -143,14 +164,26 @@ public class RobddProgram extends Application {
 	}
 	
 	private void initialize() {
-		this.WIDTH = 1000;
-		this.HEIGHT = 600;
+		this.WIDTH = 250;
+		this.HEIGHT = 200;
+		
 		this.equation = null;
+		this.order = null;
 		this.varOrder = null;
+		this.charEquation = null;
+		this.robdd = null;
+		this.ops = new Operators();
 		this.reservedChars = new char[]{'0', '1'};
 		
 		// Creating primary layout
 		primaryLayout = new GridPane();
+		
+		// Creating canvas layout
+		canvasGroup = new Group();
+		canvasScrollPane = new ScrollPane();
+		canvasScrollPane.setContent(canvasGroup);
+		canvasScrollPane.setFitToHeight(true);
+		canvasScrollPane.setFitToWidth(true);
 		
 		// Creating prompt sublayout
 		promptLayout = new GridPane();
@@ -190,6 +223,10 @@ public class RobddProgram extends Application {
 		// Adding mainMenu to primaryLayout
 		primaryLayout.setConstraints(mainMenu, 1, 1);
 		primaryLayout.getChildren().add(mainMenu);
+		
+		//Adding canvas to primaryLayout
+		primaryLayout.setConstraints(canvasScrollPane, 2, 2);
+		primaryLayout.getChildren().add(canvasScrollPane);
 		
 		// Setting primaryScene and Stage
 		primaryScene = new Scene(primaryLayout, WIDTH, HEIGHT);

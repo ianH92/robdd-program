@@ -18,8 +18,9 @@ public class RobddBuilder {
 	 * @param variableOrder The char array containing the variable order.
 	 * @return The RobddNode that holds the root of the ROBDD.
 	 */
-	public static RobddNode build(char[] expression, char[] variableOrder, Operators ops, RobddNodeTable t) throws ExpressionError {
+	public static RobddNode build(char[] expression, char[] variableOrder, Operators ops) throws ExpressionError {
 		UniqueTable h = new UniqueTable(500);
+		RobddNodeTable t =  new RobddNodeTable(200);
 		int root = buildHelper(expression, 0, variableOrder, t, h, ops);
 		return t.get(root);
 	}
@@ -87,7 +88,7 @@ public class RobddBuilder {
 					throw new ExpressionError("Insufficient number of variables in expression.");
 				}
 				
-				if(operatorArgs == 1) {
+				if(operatorArgs == 2) {
 					stack.push(new Character(ops.performOperation
 										(currChar, stack.pop().charValue(), stack.pop().charValue())));
 				} else {
@@ -116,15 +117,20 @@ public class RobddBuilder {
 	private static char[] shannonExpansion(char[] exp, char variable, char replacement) {
 		int index = 0;
 		char currChar = 'a';
+		char[] newExp = new char[exp.length];
 		
-		while(index < exp.length) {
+		while(index < newExp.length) {
+			// Take char from old expression
 			currChar = exp[index];
 			
+			// Use the replacement in position i if variable matches, else use value from exp
 			if(currChar == variable) {
-				exp[index] = replacement;
+				newExp[index] = replacement;
+			} else {
+				newExp[index] = currChar;
 			}
 			index ++;
 		}
-		return exp;
+		return newExp;
 	}
 }
