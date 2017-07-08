@@ -17,6 +17,10 @@ public class RobddNode {
 	private RobddNode leftChild;
 	private RobddNode rightChild;
 	
+	// x and y coordinates; used for drawing
+	private int x;
+	private int y;
+	
 	// Identifies if the Node has been counted during a traversal.
 	private int count;
 	
@@ -33,6 +37,8 @@ public class RobddNode {
 		this.variable = i;
 		this.count = 0;
 		this.level = -1;
+		this.x = -1;
+		this.y = -1;
 		
 		this.leftLink = l;
 		this.rightLink = h;
@@ -96,6 +102,21 @@ public class RobddNode {
 		return this.rightChild;
 	}
 	
+	/** Returns node variable.
+	 * @return The node variable.
+	 */
+	public int getVar() {
+		return this.variable;
+	}
+	
+	public int getX() {
+		return this.x;
+	}
+	
+	public int getY() {
+		return this.y;
+	}
+	
 	/**
 	 *
 	 */
@@ -111,10 +132,11 @@ public class RobddNode {
 		this.rightChild = r;
 	}
 	
-	/** Returns node variable.
-	 * @return The node variable.
-	 */
-	public int getVar() {
-		return this.variable;
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	public void setY(int y) {
+		this.y = y;
 	}
 }
