@@ -21,20 +21,20 @@ public class DrawRobdd {
 		// And the number of levels is
 		int numOfLevels = r.levelsCount.length;
 		
-		int nodeWidth = 20;
-		int nodeSpace = 55;
-		int levelSeparation = 55;
-		int drawWidth = nodeSpace * maxNodes;
-		int drawHeight = numOfLevels * levelSeparation;
 		int xBuffer = 10;
-		int yBuffer = 10;
+		int yBuffer = 20;
+		int nodeWidth = 20;
+		int nodeSpace = 70;
+		int levelSeparation = 70;
+		int drawWidth = nodeSpace * maxNodes;
+		int drawHeight = ((numOfLevels - 1) * levelSeparation) + (2 * yBuffer);
 		
 		// Calculate canvas's true height/width
 		int height = drawHeight + (2 * xBuffer);
 		int width = drawWidth + (2 * yBuffer);
 		
 		// Calculate the middle of the canvas
-		int middle = (drawWidth / 2) + xBuffer;
+		int middle = (width / 2);
 		
 		int[] levelStartX = new int[numOfLevels];
 		int totalLevelWidth = 0;
