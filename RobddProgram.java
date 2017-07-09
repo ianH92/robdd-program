@@ -1,49 +1,30 @@
-// Basic FX imports
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-// Group imports
 import javafx.scene.Group;
-
-// VBox imports
 import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
-
-// BorderPane layouts
 import javafx.scene.layout.BorderPane;
-
-// GridPane imports
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
-
-// TextField imports
 import javafx.scene.control.TextField;
-
-// Button imports
 import javafx.scene.control.Button;
-
-// MenuBar imports
 import javafx.scene.control.MenuBar;
-
-// Menu imports
 import javafx.scene.control.Menu;
-
-// MenuItem imports
 import javafx.scene.control.MenuItem;
-
-// Modality imports
 import javafx.stage.Modality;
-
-// Label imports
 import javafx.scene.control.Label;
-
-// Canvas imports
 import javafx.scene.canvas.Canvas;
-
-// ScrollPane imports
 import javafx.scene.control.ScrollPane;
+
+import javafx.scene.image.WritableImage;
+import javafx.embed.swing.SwingFXUtils;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 
 /**
  *
@@ -77,11 +58,11 @@ public class RobddProgram extends Application {
 	private Group canvasGroup;
 	private ScrollPane canvasScrollPane;
 	private Canvas nodeCanvas;
-	private Canvas egdeCanvas;
 	
 	private int WIDTH;
 	private int HEIGHT;
 	
+	private String fileName;
 	
 	/**
 	 *
@@ -105,76 +86,9 @@ public class RobddProgram extends Application {
 		primaryStage.show();
 	}
 	
-	private void setActions() {
-		drawButton.setOnAction(e -> {
-			equation = inputEqtn.getText();
-			order = inputOrder.getText();
-			
-			
-			try {
-				checkString(equation, reservedChars);
-				checkString(order, reservedChars);
-				varOrder = order.toCharArray();
-				charEquation = ShuntingYardAlgorithm.infixToPostfix(equation, varOrder, ops);
-				robdd = Robdd.RobddFactory(charEquation, varOrder, ops);
-				nodeCanvas = DrawRobdd.drawRobddNodes(robdd, varOrder);
-				
-				canvasGroup.getChildren().clear();
-				canvasGroup.getChildren().add(nodeCanvas);
-				canvasScrollPane.setContent(canvasGroup);
-				primaryLayout.setCenter(canvasScrollPane);
-			} catch(ExpressionError err) {
-				errorDisplay(err);
-			}
-		});
-		
-		clearButton.setOnAction(e -> {
-				inputEqtn.clear();
-				inputOrder.clear();
-				canvasGroup.getChildren().clear();
-				canvasGroup.getChildren().add(placeholderCanvas);
-				canvasScrollPane.setContent(canvasGroup);
-				primaryLayout.setCenter(canvasScrollPane);
-		});
-	}
-	
-	/** Creates a graphical display for a passed error.
-	 * @param e The exception whose message will be displayed.
-	 */
-	private void errorDisplay(Exception e) {
-		Stage errorMsg = new Stage();
-		errorMsg.initModality(Modality.WINDOW_MODAL);
-		VBox err = new VBox(10.0);
-		err.setAlignment(Pos.CENTER);
-		Button b = new Button("Close");
-		b.setOnAction(n -> {
-			errorMsg.close();
-		});
-		Label errMsg = new Label(e.getMessage());
-		err.getChildren().addAll(errMsg, b);
-		errorMsg.setScene(new Scene(err, 200.0, 200.0));
-		errorMsg.show();
-	}
-	
-	/** Method that checks if a string contains reserved characters; throws an error if it does.
-	 * @param s The String to check.
-	 * @param reserved An array of reserved characters.
-	 */
-	private void checkString(String s, char[] reserved) throws ExpressionError {
-		for(int i = 0; i < s.length(); i++) {
-			for(int j = 0; j < reserved.length; j++) {
-				if(reserved[j] == s.charAt(i)) {
-					throw new ExpressionError("Error: Character " + reserved[j] + " is reserved" +
-												" for program use and cannot be used in an equation.");
-				}
-			}
-		}
-		return;
-	}
-	
 	private void initialize() {
-		WIDTH = 325;
-		HEIGHT = 200;
+		WIDTH = 350;
+		HEIGHT = 300;
 		
 		// Calc widths and heights from base width and height
 		int canvasScrollPaneWidth = 125;
@@ -189,6 +103,7 @@ public class RobddProgram extends Application {
 		charEquation = null;
 		robdd = null;
 		ops = new Operators();
+		fileName = null;
 		
 		// These are characters reserved for use by the program
 		reservedChars = new char[]{'0', '1'};
@@ -256,6 +171,115 @@ public class RobddProgram extends Application {
 		primaryScene = new Scene(primaryLayout, WIDTH, HEIGHT);
 		primaryStage.setTitle("RobddProgram");
 		primaryStage.setScene(primaryScene);
+	}
+	
+	private void setActions() {
+		drawButton.setOnAction(e -> {
+			equation = inputEqtn.getText();
+			order = inputOrder.getText();
+			
+			try {
+				checkString(equation, reservedChars);
+				checkString(order, reservedChars);
+				varOrder = order.toCharArray();
+				charEquation = ShuntingYardAlgorithm.infixToPostfix(equation, varOrder, ops);
+				robdd = Robdd.RobddFactory(charEquation, varOrder, ops);
+				nodeCanvas = DrawRobdd.drawRobddNodes(robdd, varOrder);
+				
+				canvasGroup.getChildren().clear();
+				canvasGroup.getChildren().add(nodeCanvas);
+				canvasScrollPane.setContent(canvasGroup);
+				primaryLayout.setCenter(canvasScrollPane);
+			} catch(ExpressionError err) {
+				errorDisplay(err);
+			}
+		});
+		
+		clearButton.setOnAction(e -> {
+				inputEqtn.clear();
+				inputOrder.clear();
+				canvasGroup.getChildren().clear();
+				canvasGroup.getChildren().add(placeholderCanvas);
+				canvasScrollPane.setContent(canvasGroup);
+				primaryLayout.setCenter(canvasScrollPane);
+		});
+		
+		save.setOnAction(e -> {
+			savePromptDisplay();
+		});
+	}
+	
+	/** Creates a graphical display for a passed error.
+	 * @param e The exception whose message will be displayed.
+	 */
+	private void errorDisplay(Exception e) {
+		Stage errorMsg = new Stage();
+		errorMsg.initModality(Modality.WINDOW_MODAL);
+		VBox err = new VBox(10.0);
+		err.setAlignment(Pos.CENTER);
+		Button b = new Button("Close");
+		b.setOnAction(n -> {
+			errorMsg.close();
+		});
+		Label errMsg = new Label(e.getMessage());
+		err.getChildren().addAll(errMsg, b);
+		errorMsg.setScene(new Scene(err, 200.0, 200.0));
+		errorMsg.show();
+	}
+	
+	/** Creates a save prompt dialog box for saving an image.
+	 * @return the name to use when saving an image.
+	 */
+	private void savePromptDisplay() {
+		Stage savePrompt = new Stage();
+		savePrompt.initModality(Modality.WINDOW_MODAL);
+		VBox saveBox = new VBox(10.0);
+		saveBox.setAlignment(Pos.CENTER);
+		Label l = new Label("Enter the Image name below:");
+		TextField name = new TextField();
+		name.setPromptText("Enter File Name");
+		Button s = new Button("Save");
+		s.setOnAction(n -> {
+			fileName = name.getText();
+			
+			WritableImage image = new WritableImage((int)nodeCanvas.getWidth(), (int)nodeCanvas.getHeight());
+			nodeCanvas.snapshot(null, image);
+			BufferedImage im = SwingFXUtils.fromFXImage(image, null);
+			
+			System.out.println(fileName);
+			fileName += ".png";
+			System.out.println(fileName);
+			
+			try {
+				File f = new File(fileName);
+				ImageIO.write(im, "png", f);
+			} catch(IOException err) {
+				System.out.println("Caught an IOException when saving image.");
+			} catch(NullPointerException err) {
+				System.out.println("Caught a NullPointerException when saving image.");
+			}
+			savePrompt.close();
+		});
+		saveBox.getChildren().addAll(l, name, s);
+		saveBox.setMargin(name, new Insets(10.0));
+		savePrompt.setScene(new Scene(saveBox, 200.0, 150.0));
+		savePrompt.show();
+	}
+	
+	/** Method that checks if a string contains reserved characters; throws an error if it does.
+	 * @param s The String to check.
+	 * @param reserved An array of reserved characters.
+	 */
+	private void checkString(String s, char[] reserved) throws ExpressionError {
+		for(int i = 0; i < s.length(); i++) {
+			for(int j = 0; j < reserved.length; j++) {
+				if(reserved[j] == s.charAt(i)) {
+					throw new ExpressionError("Error: Character " + reserved[j] + " is reserved" +
+												" for program use and cannot be used in an equation.");
+				}
+			}
+		}
+		return;
 	}
 }
 
