@@ -30,7 +30,7 @@ d. The characters '+', '&', '^', and ' ' ' are reserved for the OR, AND, XOR, an
 operators. The expression can contain these as operators but not as variables. 
 e. Expressions where all operators have the same precedence will be evaluated left-to-right. 
 The first three operators are placed between the two variables or subexpressions they 
-operate on. The complement operator is placed to the right of the operator it operates on.
+operate on. The negation operator is placed to the right of the operator it operates on.
 f. All other 16-byte Java characters are acceptable as variables.
 							       
 Operator Precedence:
@@ -78,8 +78,7 @@ Below are several Boolean expression test cases and variable orderings which can
 4	a&b+a'&c+b&c '&d                        abcd                         acdb
 5	a&d + b&e + c&f                        abcdef                       adbecf
 6	A + b + c +d                            abcd	
-7	a++c                                     ac	
-8	a&b&c&d&e&f&g&h&i&j&k+l&m&n&o&p    abcdefghijklmnop	
+7	a&b&c&d&e&f&g&h&i&j&k+l&m&n&o&p    abcdefghijklmnop	
 
 Works Cited
 1.	Andersen, Henrik Reif. "An introduction to binary decision diagrams." Lecture notes, available online, IT University of Copenhagen (1997).

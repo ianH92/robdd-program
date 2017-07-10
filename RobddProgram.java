@@ -87,11 +87,11 @@ public class RobddProgram extends Application {
 	}
 	
 	private void initialize() {
-		WIDTH = 350;
+		WIDTH = 400;
 		HEIGHT = 300;
 		
 		// Calc widths and heights from base width and height
-		int canvasScrollPaneWidth = 125;
+		int canvasScrollPaneWidth = 225;
 		int canvasScrollPaneHeight = HEIGHT - 10;
 		int promptLayoutWidth = (WIDTH - canvasScrollPaneWidth);
 		int promptLayoutHeight = HEIGHT;
