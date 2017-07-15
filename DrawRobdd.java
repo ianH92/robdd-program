@@ -1,4 +1,3 @@
-// Canvas imports
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -10,6 +9,10 @@ import javafx.scene.paint.Color;
 
 public class DrawRobdd {
 
+	/** Method used to draw the Robdd
+	 * @param r the robdd to be drawn.
+	 * @param variables the variables of the robdd in order.
+	 */
 	public static Canvas drawRobddNodes(Robdd r, char[] variables) {
 		// Array of Colors used in drawing the nodes.
 		Color[] cols = {Color.DEEPSKYBLUE, Color.MEDIUMSEAGREEN, Color.LIGHTCORAL, 
@@ -67,12 +70,6 @@ public class DrawRobdd {
 		// Draw the edges and the nodes
 		double[] lineDashArray = {5.0};
 		for(int i = 0; i < numOfLevels; i++) {
-			/* Keep track of the number of shifts used to avoid edge-node intersection.
-			 * The two ints below help increase the shift slightly each time it is required to help
-			 * prevent two edges from overlapping significantly.
-			 */
-			int numOfRightShifts = 0;
-			int numOfLeftShifts = 0;
 			
 			for(int j = 0; j < r.levelsCount[i]; j++) {
 				RobddNode n =  r.nodes[i][j];
@@ -92,57 +89,7 @@ public class DrawRobdd {
 						gc.setLineDashes(lineDashArray);
 						gc.strokeLine(x, y, leftX, leftY);
 					} else {
-						/* For each node below the left of the parent and above the level of the child,
-						 * determine if the edge will intersect another node. If so, draw arround that
-						 * node.
-						 * Use double int array to store points to between.
-						 */
-						int[][] xyPoints = new int[numOfLevels + 1][2];
-						int numOfPoints = 0;
-						
-						// Add the starting coordinates.
-						xyPoints[0][0] = tmpX;
-						xyPoints[0][1] = tmpY;
-						numOfPoints++;
-						boolean done = false;
-						
-						for(int k = (n.getLevel() + 1); (k <= leftChild.getLevel() && done == false); k++) {
-							for(int l = 0; l < r.nodes[k].length; l++) {
-								RobddNode tmp = r.nodes[k][l];
-								double minDistance = minDist(tmpX, tmpY, leftX, leftY, tmp.getX(), tmp.getY());
-								
-								if(minDistance > (nodeWidth / 2) || k == leftChild.getLevel()) {
-									// The min distance between edge and node is large enough, no intersection
-									if(k == leftChild.getLevel()) {
-										xyPoints[numOfPoints][0] = leftX;
-										xyPoints[numOfPoints][1] = leftY;
-										numOfPoints++;
-										done = true;
-										break;
-									}
-								} else {
-									
-									if(n.getLevel() % 2 == 0) {
-										xyPoints[numOfPoints][0] = tmp.getX() + (nodeWidth + (4 * numOfRightShifts));
-										xyPoints[numOfPoints][1] = tmp.getY() + nodeWidth;
-										numOfRightShifts++;
-									} else {
-										xyPoints[numOfPoints][0] = tmp.getX() - (nodeWidth + (4 * numOfLeftShifts));
-										xyPoints[numOfPoints][1] = tmp.getY() + nodeWidth;
-										numOfLeftShifts++;
-									}
-									tmpX = xyPoints[numOfPoints][0];
-									tmpY = xyPoints[numOfPoints][1];
-									numOfPoints++;
-								}
-							}
-						}
-						
-						// Now draw edges between the collected points.
-						for(int k = 0; k < (numOfPoints - 1); k++) {
-							gc.setLineDashes(lineDashArray);
-							gc.strokeLine(xyPoints[k][0], xyPoints[k][1], xyPoints[k + 1][0], xyPoints[k + 1][1]);
-						}
+						drawEdge(r.nodes, n, leftChild, nodeWidth, (nodeSpace / 3), gc);
 					}
 				}
 				
@@ -157,59 +104,7 @@ public class DrawRobdd {
 						gc.setLineDashes(null);
 						gc.strokeLine(x, y, rightX, rightY);
 					} else {
-						drawEdge(r.nodes, n, rightChild, nodeWidth, (nodeSpace / 3), gc);			
-						/* For each node below the left of the parent and above the level of the child,
-						 * determine if the edge will intersect another node. If so, draw arround that
-						 * node.
-						 * Use double int array to store points to between.
-						 *
-						int[][] xyPoints = new int[numOfLevels][2];
-						int numOfPoints = 0;
-						
-						// Add the starting coordinates.
-						xyPoints[0][0] = tmpX;
-						xyPoints[0][1] = tmpY;
-						numOfPoints++;
-						boolean done = false;
-						
-						for(int k = (n.getLevel() + 1); (k <= rightChild.getLevel() && done == false); k++) {
-							for(int l = 0; l < r.nodes[k].length; l++) {
-								RobddNode tmp = r.nodes[k][l];
-								double minDistance = minDist(tmpX, tmpY, rightX, rightY, tmp.getX(), tmp.getY());
-								
-								if(minDistance > (nodeWidth / 2) || k == rightChild.getLevel()) {
-									// The min distance between edge and node is large enough, no intersection
-									if(k == rightChild.getLevel()) {
-										xyPoints[numOfPoints][0] = rightX;
-										xyPoints[numOfPoints][1] = rightY;
-										numOfPoints++;
-										done = true;
-										break;
-									}
-								} else {
-									
-									if(n.getLevel() % 2 == 0) {
-										xyPoints[numOfPoints][0] = tmp.getX() + (nodeWidth + (4 * numOfRightShifts));
-										xyPoints[numOfPoints][1] = tmp.getY() + nodeWidth;
-										numOfRightShifts++;
-									} else {
-										xyPoints[numOfPoints][0] = tmp.getX() - (nodeWidth + (4 * numOfLeftShifts));
-										xyPoints[numOfPoints][1] = tmp.getY() + nodeWidth;
-										numOfLeftShifts++;
-									}
-									tmpX = xyPoints[numOfPoints][0];
-									tmpY = xyPoints[numOfPoints][1];
-									numOfPoints++;
-								}
-							}
-						}
-						
-						// Now draw edges between the collected points.
-						for(int k = 0; k < (numOfPoints - 1); k++) {
-							gc.setLineDashes(null);
-							gc.strokeLine(xyPoints[k][0], xyPoints[k][1], xyPoints[k + 1][0], xyPoints[k + 1][1]);
-						}
-						*/
+						drawEdge(r.nodes, n, rightChild, nodeWidth, (nodeSpace / 3), gc);
 					}
 				}
 				
@@ -233,8 +128,20 @@ public class DrawRobdd {
 		return canvas;		
 	}
 	
-	/**
+	/** Method draws edges between a parent node and a child node. The method draws edges arround
+	 * nodes to avoid intersecting with nodes in between the parent and child node.
 	 *
+	 * The program calculates whether a proposed egde from parent to child will intersect any of the
+	 * nodes in betewen the parent and the child. If it doesn't, the edge is drawn. If the edge does
+	 * intersect, then the edge's terminal point is shifted left or right to avoid the node it
+	 * intersects, and the program then trys to draw from this new point to the child. If necessary
+	 * further shifts for new intersections will be added until the edge connects to the parent node.
+	 * @param nodes double array holding all nodes in the robdd.
+	 * @param parent the parent node where the edge will start.
+	 * @param child the child node where the edge will end.
+	 * @param nodeWidth constant representing the node size; used to determine intersection.
+	 * @param nodeShift constant used to determine degree to which intersecting nodes are shifted.
+	 * @param gc GraphicsContext to which the edges are drawn.
 	 */
 	private static void drawEdge(RobddNode[][] nodes, RobddNode parent, RobddNode child, int nodeWidth,
 								int nodeShift, GraphicsContext gc) {
@@ -247,6 +154,7 @@ public class DrawRobdd {
 		int finalX = child.getX();
 		int finalY = child.getY();
 		 
+		// Array used to hold points which make up the edge.
 		int[][] xyPoints = new int[numLevels][2];
 		int numOfPoints = 0;
 		
@@ -255,6 +163,7 @@ public class DrawRobdd {
 		xyPoints[0][1] = startY;
 		numOfPoints++;
 		
+		// For nodes one level below parent to one level above child, check for intersection.
 		for(int i = lowestLevel; i <= highestLevel; i++) {
 			for(int j = 0; j < nodes[i].length; j++) {
 				RobddNode tmp = nodes[i][j];
@@ -265,6 +174,7 @@ public class DrawRobdd {
 				if(minDistance > (nodeWidth / 2)) {
 					// The min distance between edge and node is large enough, no intersection
 				} else {
+					// Shift point left or right based on location of parent and intersecting node.
 					if(startX < tmpX) {
 						xyPoints[numOfPoints][0] = tmp.getX() - (nodeShift + (5 * numOfPoints));
 						xyPoints[numOfPoints][1] = tmp.getY();
@@ -272,6 +182,7 @@ public class DrawRobdd {
 						xyPoints[numOfPoints][0] = tmp.getX() + (nodeShift + (5 * numOfPoints));
 						xyPoints[numOfPoints][1] = tmp.getY();
 					} else {
+						// Use modulus to avoid egde clustering by dividing between left and right.
 						if(lowestLevel % 2 == 0) {
 							xyPoints[numOfPoints][0] = tmp.getX() - (nodeShift + (5 * numOfPoints));
 							xyPoints[numOfPoints][1] = tmp.getY();
@@ -321,8 +232,12 @@ public class DrawRobdd {
 	}
 		
 		
-	
-	public static Canvas getWhiteCanvas(int width, int height) {
+	/** Method returns a painted white Canvas of the specified size.
+	 * @param width the width of the Canvas.
+	 * @param height the height of the Canvas.
+	 * @return the white Canvas.
+	 */
+	private static Canvas getWhiteCanvas(int width, int height) {
 		Canvas c = new Canvas(width, height);
 		GraphicsContext g = c.getGraphicsContext2D();
 		g.setFill(Color.WHITE);
@@ -330,6 +245,9 @@ public class DrawRobdd {
 		return c;
 	}
 	
+	/** Helper method. Returns the max element of an int array.
+	 * @return the max element of the array.
+	 */
 	private static int getMax(int[] a) {
 		int max = 0;
 		for(int i = 0; i < a.length; i++) {
