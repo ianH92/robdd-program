@@ -9,6 +9,10 @@ import javafx.scene.paint.Color;
 
 public class DrawRobdd {
 
+	/** Method used to draw the Robdd
+	 * @param r the robdd to be drawn.
+	 * @param variables the variables of the robdd in order.
+	 */
 	public static Canvas drawRobddNodes(Robdd r, char[] variables) {
 		// Array of Colors used in drawing the nodes.
 		Color[] cols = {Color.DEEPSKYBLUE, Color.MEDIUMSEAGREEN, Color.LIGHTCORAL, 
