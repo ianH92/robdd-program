@@ -84,12 +84,13 @@ public class DrawRobdd {
 					int leftX = leftChild.getX();
 					int leftY= leftChild.getY();
 				
+					// Set the line to draw in dashes
+					gc.setLineDashes(lineDashArray);
 					if((n.getLevel() + 1) == leftChild.getLevel()) {
 						// If child is only one level below then no possible intersection, just draw
-						gc.setLineDashes(lineDashArray);
 						gc.strokeLine(x, y, leftX, leftY);
 					} else {
-						drawEdge(r.nodes, n, leftChild, nodeWidth, (nodeSpace / 3), gc);
+						drawEdge(r.nodes, n, leftChild, nodeWidth, (nodeSpace/2), gc, 0);
 					}
 				}
 				
@@ -97,14 +98,15 @@ public class DrawRobdd {
 				RobddNode rightChild = n.getRightChild();
 				if(rightChild != null) {
 					
+					// Set the line to draw a solid line
+					gc.setLineDashes(null);
 					if((n.getLevel() + 1) == rightChild.getLevel()) {
 						// If child is only one level below then no possible intersection, just draw
 						int rightX = rightChild.getX();
 						int rightY = rightChild.getY();
-						gc.setLineDashes(null);
 						gc.strokeLine(x, y, rightX, rightY);
 					} else {
-						drawEdge(r.nodes, n, rightChild, nodeWidth, (nodeSpace / 3), gc);
+						drawEdge(r.nodes, n, rightChild, nodeWidth, (nodeSpace/2), gc, 1);
 					}
 				}
 				
@@ -142,9 +144,10 @@ public class DrawRobdd {
 	 * @param nodeWidth constant representing the node size; used to determine intersection.
 	 * @param nodeShift constant used to determine degree to which intersecting nodes are shifted.
 	 * @param gc GraphicsContext to which the edges are drawn.
+	 * @param flag an flag for if edge is a left edge or a right edge; 0 = left, all others = right.
 	 */
 	private static void drawEdge(RobddNode[][] nodes, RobddNode parent, RobddNode child, int nodeWidth,
-								int nodeShift, GraphicsContext gc) {
+								int nodeShift, GraphicsContext gc, int flag) {
 		int numLevels = nodes.length;
 		int lowestLevel = (parent.getLevel() + 1);
 		int highestLevel = (child.getLevel() - 1);
@@ -203,14 +206,21 @@ public class DrawRobdd {
 		xyPoints[numOfPoints][1] = finalY;
 		numOfPoints++;
 		
+		// Set the line to be dashed or solid based on the flag
+		if(flag == 0) {
+			double[] lineDashArray = {5.0};
+			gc.setLineDashes(lineDashArray);
+		} else {
+			gc.setLineDashes(null);
+		}
+		
 		// Now draw edges between the collected points.
 		for(int k = 0; k < (numOfPoints - 1); k++) {
-			gc.setLineDashes(null);
 			gc.strokeLine(xyPoints[k][0], xyPoints[k][1], xyPoints[k + 1][0], xyPoints[k + 1][1]);
 		}
 	}
 	
-	/** Method which computes the minimum distance from a line to a point. Used to determine if and
+	/** Method which computes the minimum distance from a line to a point. Used to determine if an
 	 * edge intersects with a node.
 	 * 
 	 * The method works by describing a line as a segment between two points (x1, y1) and (x2,y2).
@@ -237,7 +247,7 @@ public class DrawRobdd {
 	 * @param height the height of the Canvas.
 	 * @return the white Canvas.
 	 */
-	private static Canvas getWhiteCanvas(int width, int height) {
+	public static Canvas getWhiteCanvas(int width, int height) {
 		Canvas c = new Canvas(width, height);
 		GraphicsContext g = c.getGraphicsContext2D();
 		g.setFill(Color.WHITE);
