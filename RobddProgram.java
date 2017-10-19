@@ -18,12 +18,15 @@ import javafx.stage.Modality;
 import javafx.scene.control.Label;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollPane;
-
 import javafx.scene.image.WritableImage;
 import javafx.embed.swing.SwingFXUtils;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -64,16 +67,10 @@ public class RobddProgram extends Application {
 	
 	private String fileName;
 	
-	/**
-	 *
-	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
 	
-	/**
-	 *
-	 */
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
@@ -86,6 +83,8 @@ public class RobddProgram extends Application {
 		primaryStage.show();
 	}
 	
+	/** Method used to group code where GUI elements are initialized.
+	 */
 	private void initialize() {
 		WIDTH = 400;
 		HEIGHT = 300;
@@ -173,6 +172,8 @@ public class RobddProgram extends Application {
 		primaryStage.setScene(primaryScene);
 	}
 	
+	/** Method used t group sections of code where buttons' actions are defined.
+	 */ 
 	private void setActions() {
 		drawButton.setOnAction(e -> {
 			equation = inputEqtn.getText();
@@ -207,6 +208,10 @@ public class RobddProgram extends Application {
 		save.setOnAction(e -> {
 			savePromptDisplay();
 		});
+		
+		help.setOnAction(e -> {
+			readmeDisplay();
+		});
 	}
 	
 	/** Creates a graphical display for a passed error.
@@ -226,6 +231,35 @@ public class RobddProgram extends Application {
 		errorMsg.setScene(new Scene(err, 200.0, 200.0));
 		errorMsg.show();
 	}
+	
+	/** Displays the README file for the program, or an error if the file is not found.
+	 */
+	private void readmeDisplay() {
+		Stage helpStage = new Stage();
+		helpStage.initModality(Modality.WINDOW_MODAL);
+		ScrollPane s = new ScrollPane();
+		VBox v = new VBox(2);
+		
+		try{
+			FileReader f = new FileReader("README.txt");
+			BufferedReader b = new BufferedReader(f);
+			
+			String reader = b.readLine();
+			while(reader != null) {
+				v.getChildren().add(new Label(reader));
+				reader = b.readLine();
+			}
+			s.setContent(v);
+		}catch(FileNotFoundException e){
+			errorDisplay(new Exception("Error: README.txt not found."));
+		}catch(IOException e){
+			errorDisplay(new Exception("Error: File Read Error."));
+		}
+		
+		helpStage.setScene(new Scene(s, 600, 600));
+		helpStage.show();
+	}
+	
 	
 	/** Creates a save prompt dialog box for saving an image.
 	 * @return the name to use when saving an image.
@@ -282,24 +316,3 @@ public class RobddProgram extends Application {
 		return;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
