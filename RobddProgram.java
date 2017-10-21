@@ -141,7 +141,7 @@ public class RobddProgram extends Application {
 		// Creating menu and adding to primaryLayout
 		mainMenu = new MenuBar();
 		fileMenu = new Menu("File");
-		save = new MenuItem("Save RobddImage");
+		save = new MenuItem("Save Robdd Image");
 		fileMenu.getItems().add(save);
 		helpMenu = new Menu("Help");
 		help = new MenuItem("Program Information");
@@ -275,22 +275,17 @@ public class RobddProgram extends Application {
 		Button s = new Button("Save");
 		s.setOnAction(n -> {
 			fileName = name.getText();
+			fileName += ".png";
 			
 			WritableImage image = new WritableImage((int)nodeCanvas.getWidth(), (int)nodeCanvas.getHeight());
 			nodeCanvas.snapshot(null, image);
 			BufferedImage im = SwingFXUtils.fromFXImage(image, null);
 			
-			System.out.println(fileName);
-			fileName += ".png";
-			System.out.println(fileName);
-			
 			try {
 				File f = new File(fileName);
 				ImageIO.write(im, "png", f);
-			} catch(IOException err) {
-				System.out.println("Caught an IOException when saving image.");
-			} catch(NullPointerException err) {
-				System.out.println("Caught a NullPointerException when saving image.");
+			} catch(Exception err) {
+				errorDisplay(err);
 			}
 			savePrompt.close();
 		});
